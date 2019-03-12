@@ -1243,6 +1243,25 @@ describe('FuzzyFinder', () => {
       })
     })
 
+    describe('fuzzy finder selection is confirmed', () => {
+      it('opens the selected item', async () => {
+        await projectView.toggle()
+        await waitForPathsToDisplay(projectView)
+
+        spyOn(projectView, 'preview').andCallThrough()
+
+        projectView.selectListView.refs.queryEditor.setText('sample.html')
+
+        await conditionPromise(() => projectView.preview.callCount > 0)
+
+        const editor = pane.getPendingItem()
+        atom.commands.dispatch(projectView.element, 'core:confirm')
+
+        expect(editor).toBe(atom.workspace.getActiveTextEditor())
+        expect(pane.getPendingItem()).toBeNull
+      })
+    })
+
     describe('fuzzy finder is cancelled', () => {
       describe('with an editor already open', () => {
         it('closes the pending editor and activates the original editor', async () => {
